@@ -2,18 +2,17 @@ from typing import Optional, List
 
 
 class ModelMetadata:
-    def __init__(self,
-                 *,
-                 groupId: str,
-                 artifactId: str) -> None:
-        self.model_version = '1.1.0'
+    def __init__(self, *, groupId: str, artifactId: str) -> None:
+        self.model_version = "1.1.0"
         self.groupId = groupId
         self.artifactId = artifactId
-        self.version: Optional[str] = None  # the version this folder represents, used for snapshots only
+        self.version: Optional[
+            str
+        ] = None  # the version this folder represents, used for snapshots only
         self.versioning: Versioning = Versioning()
         self.plugins: List[Plugin] = []
 
-    def merge(self, source_metadata: 'ModelMetadata') -> None:
+    def merge(self, source_metadata: "ModelMetadata") -> None:
         for plugin in source_metadata.plugins:
             found = False
             for pre_existing in self.plugins:
@@ -21,11 +20,13 @@ class ModelMetadata:
                     break
 
             if not found:
-                self.plugins.append(Plugin(
-                    artifactId=plugin.artifactId,
-                    prefix=plugin.prefix,
-                    name=plugin.name,
-                ))
+                self.plugins.append(
+                    Plugin(
+                        artifactId=plugin.artifactId,
+                        prefix=plugin.prefix,
+                        name=plugin.name,
+                    )
+                )
 
         versioning = source_metadata.versioning
         if versioning:
@@ -37,7 +38,9 @@ class ModelMetadata:
                     self.versioning.versions.append(version)
 
             if "null" == versioning.lastUpdated:
-                versioning.lastUpdated = None  # FIXME: serialize nulls as "null" for lastUpdated
+                versioning.lastUpdated = (
+                    None  # FIXME: serialize nulls as "null" for lastUpdated
+                )
 
             if "null" == self.versioning.lastUpdated:
                 self.versioning.lastUpdated = None
@@ -47,7 +50,10 @@ class ModelMetadata:
 
             assert versioning.lastUpdated
 
-            if not self.versioning.lastUpdated or self.versioning.lastUpdated < versioning.lastUpdated:
+            if (
+                not self.versioning.lastUpdated
+                or self.versioning.lastUpdated < versioning.lastUpdated
+            ):
                 self.versioning.lastUpdated = versioning.lastUpdated
 
                 if versioning.release:
@@ -62,12 +68,18 @@ class ModelMetadata:
 
 class Versioning:
     def __init__(self):
-        self.latest: Optional[str] = None         # what the latest version in the directory is, including snapshots
-        self.release: Optional[str] = None        # current release (non snapshot)
-        self.snapshot: Optional[Snapshot] = None  # current snapshot data used for this version
+        self.latest: Optional[
+            str
+        ] = None  # what the latest version in the directory is, including snapshots
+        self.release: Optional[str] = None  # current release (non snapshot)
+        self.snapshot: Optional[
+            Snapshot
+        ] = None  # current snapshot data used for this version
 
-        self.versions: List[str] = []             # versions available for the artifact - release + snapshots
-        self.lastUpdated: Optional[str] = None    # when was the metadata last updated
+        self.versions: List[
+            str
+        ] = []  # versions available for the artifact - release + snapshots
+        self.lastUpdated: Optional[str] = None  # when was the metadata last updated
         self.snapshotVersions: List[SnapshotVersion] = []
 
 
@@ -87,10 +99,7 @@ class SnapshotVersion:
 
 
 class Plugin:
-    def __init__(self,
-                 name: str,
-                 prefix: str,
-                 artifactId: str) -> None:
+    def __init__(self, name: str, prefix: str, artifactId: str) -> None:
         self.name = name
         self.prefix = prefix
         self.artifactId = artifactId

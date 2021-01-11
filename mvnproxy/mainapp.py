@@ -19,9 +19,10 @@ os.makedirs(config.cache_folder, exist_ok=True)
 
 app = flask.Flask("mvnproxy")
 
-@app.route('/', methods=['GET'])
+
+@app.route("/", methods=["GET"])
 def index_page():
-    return send_file('../static/index.html')
+    return send_file("../static/index.html")
 
 
 # @app.route('/repo/<path:path>', methods=['HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'])
@@ -30,7 +31,7 @@ def index_page():
 #     raise Exception("not implemented")
 
 
-@app.route('/repo/<path:path>', methods=['GET'])
+@app.route("/repo/<path:path>", methods=["GET"])
 def maven_file(path: str):
     try:
         if is_cached(path):
@@ -62,7 +63,7 @@ def cache_path(path: str) -> str:
 def compute_sha1_checksum(path: str) -> None:
     # we remove the .sha1 suffix
     file_path = cache_path(path)
-    with open(file_path[:-5] , "rb") as input_file:
+    with open(file_path[:-5], "rb") as input_file:
         with open(file_path, "wt") as output_file:
             sha_1 = hashlib.sha1()
             sha_1.update(input_file.read())
@@ -81,7 +82,7 @@ def construct_maven_metadata(path: str) -> None:
         auth = None
 
         if mirror.auth:
-            auth = (mirror.auth['user'], mirror.auth['pass'])
+            auth = (mirror.auth["user"], mirror.auth["pass"])
 
         r = requests.get(f"{mirror.url}{path}", auth=auth)
 
@@ -106,21 +107,31 @@ def download_from_remotes(path) -> None:
         auth = None
 
         if mirror.auth:
-            auth = (mirror.auth['user'], mirror.auth['pass'])
+            auth = (mirror.auth["user"], mirror.auth["pass"])
 
         r = requests.get(f"{mirror.url}{path}", auth=auth)
 
         if not r.ok:
             if r.status_code == 401:
-                print(termcolor_util.red(f"401 UNAUTHORIZED: {mirror.url} failed to resolve {path}: {r}"))
+                print(
+                    termcolor_util.red(
+                        f"401 UNAUTHORIZED: {mirror.url} failed to resolve {path}: {r}"
+                    )
+                )
             if r.status_code == 403:
-                print(termcolor_util.red(f"403 FORBIDDEN: {mirror.url} failed to resolve {path}: {r}"))
+                print(
+                    termcolor_util.red(
+                        f"403 FORBIDDEN: {mirror.url} failed to resolve {path}: {r}"
+                    )
+                )
             else:
-                print(termcolor_util.yellow(f"{mirror.url} failed to resolve {path}: {r}"))
+                print(
+                    termcolor_util.yellow(f"{mirror.url} failed to resolve {path}: {r}")
+                )
 
             continue
 
-        with open(cache_path(path), 'wb') as f:
+        with open(cache_path(path), "wb") as f:
             f.write(r.content)
 
         return

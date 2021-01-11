@@ -2,7 +2,13 @@ import io
 from typing import Optional, Union, List
 from xml.etree.ElementTree import ElementTree, Element
 
-from mvnproxy.metadata.model import ModelMetadata, Snapshot, SnapshotVersion, Versioning, Plugin
+from mvnproxy.metadata.model import (
+    ModelMetadata,
+    Snapshot,
+    SnapshotVersion,
+    Versioning,
+    Plugin,
+)
 
 
 def write_model(model: Optional[ModelMetadata]) -> ElementTree:
@@ -24,9 +30,8 @@ def write_model(model: Optional[ModelMetadata]) -> ElementTree:
 
 
 def xml_add_element_text(
-        parent_element: Element,
-        tag: str,
-        text: Optional[Union[int, str, bool]]) -> Optional[Element]:
+    parent_element: Element, tag: str, text: Optional[Union[int, str, bool]]
+) -> Optional[Element]:
     if text is None:
         return None
 
@@ -49,7 +54,7 @@ def xml_add_element(node: Element, tag: str) -> Element:
     return element
 
 
-def xml_add_versions(node: Element,  versions: List[str]):
+def xml_add_versions(node: Element, versions: List[str]):
     if not versions:
         return
 
@@ -70,19 +75,27 @@ def xml_add_snapshot(versions_node: Element, snapshot: Optional[Snapshot]):
     xml_add_element_text(snapshot_node, "localCopy", snapshot.localCopy)
 
 
-def xml_add_snapshot_versions(versions_element: Element, snapshotVersions: List[SnapshotVersion]):
+def xml_add_snapshot_versions(
+    versions_element: Element, snapshotVersions: List[SnapshotVersion]
+):
     if not snapshotVersions:
         return
 
     snapshot_versions_node = xml_add_element(versions_element, "snapshotVersions")
 
     for snapshotVersion in snapshotVersions:
-        snapshot_version_node = xml_add_element(snapshot_versions_node, "snapshotVersion")
+        snapshot_version_node = xml_add_element(
+            snapshot_versions_node, "snapshotVersion"
+        )
 
-        xml_add_element_text(snapshot_version_node, "extension", snapshotVersion.extension)
+        xml_add_element_text(
+            snapshot_version_node, "extension", snapshotVersion.extension
+        )
         xml_add_element_text(snapshot_version_node, "version", snapshotVersion.version)
         xml_add_element_text(snapshot_version_node, "updated", snapshotVersion.updated)
-        xml_add_element_text(snapshot_version_node, "classifier", snapshotVersion.classifier)
+        xml_add_element_text(
+            snapshot_version_node, "classifier", snapshotVersion.classifier
+        )
 
 
 def xml_add_versioning(metadata_element: Element, versioning: Optional[Versioning]):

@@ -57,4 +57,6 @@ def merge_maven_metadata(documents: Iterable[xml.etree.ElementTree.ElementTree])
 
 
 def xml_to_string(document: ElementTree) -> str:
-    return xml.etree.ElementTree.tostring(document.getroot(), encoding='utf8', method='xml').decode('utf-8')
+    return xml.etree.ElementTree.tostring(
+        document.getroot(), encoding="utf8", method="xml"
+    ).decode("utf-8")

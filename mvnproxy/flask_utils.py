@@ -3,7 +3,8 @@ import inspect
 from flask import request, jsonify  # type: ignore
 
 from typing import TypeVar, Callable
-T = TypeVar('T')
+
+T = TypeVar("T")
 
 
 def form_params(f: Callable[..., T]) -> Callable[..., T]:
@@ -65,6 +66,7 @@ def query_json_params(*parameters: str) -> Callable[..., Callable[..., T]]:
     Decorator that will read the given parameters from the request
     decode them as JSON, and pass them down the stack chain.
     """
+
     def wrapper(f: Callable[..., T]) -> Callable[..., T]:
         @functools.wraps(f)
         def logic(*args, **kw) -> T:
