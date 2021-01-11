@@ -1,0 +1,6 @@
+arg0: mvnproxy
+mvnproxy: true
+templates:
+- py3/flask
+- pyi/addict
+- pyi/yaml

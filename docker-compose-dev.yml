@@ -1,0 +1,26 @@
+version: "3"
+services:
+  npmlive:
+    image: node:8
+    ports:
+      - 7000:7000
+    volumes:
+      - ../mvnproxy-web:/src/:rw
+    working_dir: /src
+    links:
+      - mvnproxy
+    environment:
+      HOST: 0.0.0.0
+      PORT: 7000
+    command: ["npm", "run", "dev"]
+
+  mvnproxy:
+    image: mvnproxy
+    volumes:
+      - .:/src:ro
+    working_dir: /src
+    environment:
+      PYTHONPATH: .
+    command: ["python", "application.py"]
+    # uwsgi --thunder-lock --http :7000 --wsgi-file mvnproxy/mainapp.py
+
