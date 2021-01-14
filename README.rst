@@ -1,1 +1,8 @@
-GENERATE WITH bin/update-readme.py
+mvnproxy program.
+
+Installation
+============
+
+.. code:: sh
+
+    pip install mvnproxy
