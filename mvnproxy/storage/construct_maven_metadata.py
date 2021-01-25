@@ -8,6 +8,10 @@ from mvnproxy import config
 from mvnproxy.metadata.merger import merge_maven_metadata, xml_to_string
 from mvnproxy.storage import cache_path
 
+import logging
+
+LOG = logging.getLogger(__name__)
+
 
 def construct_maven_metadata(path: str) -> None:
     artifact_folder = cache_path(os.path.dirname(path))
@@ -16,7 +20,7 @@ def construct_maven_metadata(path: str) -> None:
     known_xmls = []
 
     for mirror in config.data.mirrors:
-        print(f"Trying to fetch {mirror.url}{path}")
+        LOG.info("Trying to fetch %s%s", mirror.url, path)
         auth = None
 
         if mirror.auth:
@@ -25,7 +29,7 @@ def construct_maven_metadata(path: str) -> None:
         r = requests.get(f"{mirror.url}{path}", auth=auth)
 
         if not r.ok:
-            print(f"{mirror.url} failed to resolve {path}: {r}")
+            LOG.debug("Failed to resolve %s%s: %s", mirror, path, r)
             continue
 
         known_xmls.append(ElementTree(file=io.BytesIO(r.content)))

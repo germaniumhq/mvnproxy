@@ -1,9 +1,12 @@
+import logging
 import os
 
 import fastapi
 import termcolor_util
 import uvicorn
 from fastapi.responses import FileResponse
+from fastapi.templating import Jinja2Templates
+from starlette.requests import Request
 
 from mvnproxy import config
 
@@ -13,10 +16,13 @@ from mvnproxy.storage.construct_maven_metadata import construct_maven_metadata
 from mvnproxy.storage.download_artifact import download_artifact
 from mvnproxy.storage.sha1_checksum import compute_sha1_checksum
 
+LOG = logging.getLogger(__name__)
+
 os.makedirs(config.cache_folder, exist_ok=True)
 
 app = fastapi.FastAPI()
 
+templates = Jinja2Templates(directory="../templates")
 
 print(
     termcolor_util.green(
@@ -31,12 +37,20 @@ print(
 
 
 def main():
-    uvicorn.run(app, host=config.host, port=config.port)
+    logging.basicConfig(format="{levelname:7} {message}", style="{", level=logging.INFO)
+    uvicorn.run(app, host=config.host, port=config.port, log_config=None)
 
 
 @app.get("/")
-def index_page():
-    return FileResponse("static/index.html")
+async def index_page(request: Request):
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "host": "localhost1",  # FIXME: detect IP
+            "port": str(config.port),
+        },
+    )
 
 
 # @app.route('/repo/<path:path>', methods=['HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'])
@@ -51,7 +65,7 @@ def maven_file(path: str):
         if is_cached(path):
             return FileResponse(cache_path(path))
 
-        print(f"processing non-cached: {path}")
+        LOG.info("Processing non-cached: %s", path)
 
         if path.endswith(".sha1"):
             compute_sha1_checksum(path)
@@ -62,7 +76,7 @@ def maven_file(path: str):
 
         return FileResponse(cache_path(path))
     except Exception as e:
-        print(termcolor_util.red(f"Unable to process {path}: {e}"))
+        LOG.error("Unable to process %s: %s", path, e)
         raise e
 
 

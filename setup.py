@@ -20,5 +20,6 @@ setup(
     package_data={
         "": ["*.txt", "*.rst"],
         "mvnproxy": ["py.typed"],
+        "templates": ["index.html"],
     },
 )
