@@ -2,27 +2,32 @@ import hashlib
 import io
 import os
 from xml.etree.ElementTree import ElementTree
-import textwrap
 
-import addict
-import flask
+import fastapi
 import requests
 import termcolor_util
-import yaml
-from flask import send_file
+from fastapi.responses import FileResponse
 
+from mvnproxy import config
 # this must be read like this, not with a __main__ section
 from mvnproxy.maven_metadata_merger import merge_maven_metadata, xml_to_string
-from mvnproxy import config
 
 os.makedirs(config.cache_folder, exist_ok=True)
 
-app = flask.Flask("mvnproxy")
+app = fastapi.FastAPI()
 
 
-@app.route("/", methods=["GET"])
+print(termcolor_util.green(r"""
+  __ _ _  _____  ___  _______ __ ____ __
+ /  ' \ |/ / _ \/ _ \/ __/ _ \\ \ / // /
+/_/_/_/___/_//_/ .__/_/  \___/_\_\\_, / 
+              /_/                /___/  
+"""))
+
+
+@app.get("/")
 def index_page():
-    return send_file("../static/index.html")
+    return FileResponse("static/index.html")
 
 
 # @app.route('/repo/<path:path>', methods=['HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'])
@@ -31,11 +36,11 @@ def index_page():
 #     raise Exception("not implemented")
 
 
-@app.route("/repo/<path:path>", methods=["GET"])
+@app.get("/repo/{path}")
 def maven_file(path: str):
     try:
         if is_cached(path):
-            return send_file(cache_path(path))
+            return FileResponse(cache_path(path))
 
         print(f"processing non-cached: {path}")
 
@@ -46,7 +51,7 @@ def maven_file(path: str):
         else:
             download_from_remotes(path)
 
-        return send_file(cache_path(path))
+        return FileResponse(cache_path(path))
     except Exception as e:
         print(termcolor_util.red(f"Unable to process {path}: {e}"))
         raise e

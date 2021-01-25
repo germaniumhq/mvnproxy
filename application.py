@@ -1,6 +1,5 @@
-from mvnproxy import mainapp
 from mvnproxy import config
-
+from mvnproxy import mainapp
 
 app = mainapp.app
 application = app
