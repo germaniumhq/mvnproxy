@@ -1,7 +1,7 @@
 import unittest
 from xml.etree.ElementTree import ElementTree
 
-from mvnproxy.maven_metadata_merger import merge_maven_metadata, xml_to_string
+from mvnproxy.metadata.merger import merge_maven_metadata, xml_to_string
 
 
 def read_xml(file_path: str):

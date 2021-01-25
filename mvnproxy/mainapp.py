@@ -6,6 +6,7 @@ import uvicorn
 from fastapi.responses import FileResponse
 
 from mvnproxy import config
+
 # this must be read like this, not with a __main__ section
 from mvnproxy.storage import is_cached, cache_path
 from mvnproxy.storage.construct_maven_metadata import construct_maven_metadata
@@ -17,12 +18,16 @@ os.makedirs(config.cache_folder, exist_ok=True)
 app = fastapi.FastAPI()
 
 
-print(termcolor_util.green(r"""
+print(
+    termcolor_util.green(
+        r"""
   __ _ _  _____  ___  _______ __ ____ __
  /  ' \ |/ / _ \/ _ \/ __/ _ \\ \ / // /
 /_/_/_/___/_//_/ .__/_/  \___/_\_\\_, / 
               /_/                /___/  
-"""))
+"""
+    )
+)
 
 
 def main():

@@ -10,15 +10,17 @@ from termcolor_util import red
 _config_file_path = "mvnproxy.yml"
 
 if not os.path.isfile(_config_file_path):
-    _config_file_path = os.path.join(os.environ.get("HOME"), '.mvnproxy')
+    home_folder = os.environ.get("HOME") or ""
+    _config_file_path = os.path.join(home_folder, ".mvnproxy")
 
 if not os.path.isfile(_config_file_path):
-    print(red("No configuration given.", bold=True),
-          red("Unable to find"),
-          red("mvnproxy.yml", bold=True),
-          red("nor"),
-          red(_config_file_path, bold=True),
-          )
+    print(
+        red("No configuration given.", bold=True),
+        red("Unable to find"),
+        red("mvnproxy.yml", bold=True),
+        red("nor"),
+        red(_config_file_path, bold=True),
+    )
     sys.exit(1)
 
 # interpolate environment variables
@@ -28,8 +30,7 @@ with open(_config_file_path, "rt", encoding="utf-8") as f:
     data = addict.Dict(cast(Dict, yaml.safe_load(config_content)))
 
 if not data.mirrors:
-    print(red("No mirrors defined in"),
-          red(_config_file_path, bold=True))
+    print(red("No mirrors defined in"), red(_config_file_path, bold=True))
     sys.exit(2)
 
 # use defaults and export variables
