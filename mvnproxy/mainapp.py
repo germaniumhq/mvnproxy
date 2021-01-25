@@ -1,5 +1,6 @@
 import logging
 import os
+from distutils.command.config import config
 
 import fastapi
 import termcolor_util
@@ -35,6 +36,10 @@ print(
     )
 )
 
+print(termcolor_util.cyan("Actively mirroring:", bold=True))
+for mirror in config.data.mirrors:
+    print(termcolor_util.green(mirror.url, bold=True))
+print()
 
 def main():
     logging.basicConfig(format="{levelname:7} {message}", style="{", level=logging.INFO)
@@ -47,7 +52,7 @@ async def index_page(request: Request):
         "index.html",
         {
             "request": request,
-            "host": "localhost1",  # FIXME: detect IP
+            "host": "localhost",  # FIXME: detect IP
             "port": str(config.port),
         },
     )
