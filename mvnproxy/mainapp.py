@@ -2,6 +2,7 @@ import os
 
 import fastapi
 import termcolor_util
+import uvicorn
 from fastapi.responses import FileResponse
 
 from mvnproxy import config
@@ -22,6 +23,10 @@ print(termcolor_util.green(r"""
 /_/_/_/___/_//_/ .__/_/  \___/_\_\\_, / 
               /_/                /___/  
 """))
+
+
+def main():
+    uvicorn.run(app, host=config.host, port=config.port)
 
 
 @app.get("/")
@@ -54,3 +59,7 @@ def maven_file(path: str):
     except Exception as e:
         print(termcolor_util.red(f"Unable to process {path}: {e}"))
         raise e
+
+
+if __name__ == "__main__":
+    main()

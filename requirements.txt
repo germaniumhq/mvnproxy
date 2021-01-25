@@ -1,6 +1,5 @@
-fastapi
-uvicorn[standard]
-aiofiles
 requests==2.25.1
 termcolor_util
-Click
+fastapi==0.63.0
+uvicorn[standard]==0.11.8
+aiofiles==0.6.0
