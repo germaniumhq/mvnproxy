@@ -51,6 +51,8 @@ port = int(data.get("port", 7000))
 
 
 if "cache_folder" not in data:
-    LOG.warning("cache_folder not configured in the %s. Using a temporary folder: %s that will probably get deleted on reboot",
-                _config_file_path,
-                cache_folder)
+    LOG.warning(
+        "cache_folder not configured in the %s. Using a temporary folder: %s that will probably get deleted on reboot",
+        _config_file_path,
+        cache_folder,
+    )
