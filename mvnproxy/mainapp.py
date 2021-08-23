@@ -22,7 +22,7 @@ os.makedirs(config.cache_folder, exist_ok=True)
 
 app = fastapi.FastAPI()
 
-templates = Jinja2Templates(directory="../templates")
+templates = Jinja2Templates(directory="templates")
 
 print(
     termcolor_util.green(
