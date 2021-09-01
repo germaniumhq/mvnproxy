@@ -1,6 +1,6 @@
 import string
 import xml
-from typing import Iterable
+from typing import Iterable, Union
 from xml.etree.ElementTree import Element, ElementTree
 
 from mvnproxy.metadata.model_to_xml import write_model
@@ -56,7 +56,9 @@ def merge_maven_metadata(documents: Iterable[xml.etree.ElementTree.ElementTree])
     return write_model(result)
 
 
-def xml_to_string(document: ElementTree) -> str:
+def xml_to_string(document: Union[ElementTree, Element]) -> str:
+    root_element: Element = document.getroot() if isinstance(document, ElementTree) else document
+
     return xml.etree.ElementTree.tostring(
-        document.getroot(), encoding="utf8", method="xml"
+        root_element, encoding="utf8", method="xml"
     ).decode("utf-8")

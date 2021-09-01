@@ -20,9 +20,11 @@ def write_model(model: Optional[ModelMetadata]) -> ElementTree:
 
     metadata = result.getroot()
 
-    xml_add_element_text(metadata, "groupId", model.groupId)
-    xml_add_element_text(metadata, "artifactId", model.artifactId)
-    xml_add_element_text(metadata, "version", model.version)
+    if model.artifactId is not None:
+        xml_add_element_text(metadata, "groupId", model.groupId)
+        xml_add_element_text(metadata, "artifactId", model.artifactId)
+        xml_add_element_text(metadata, "version", model.version)
+
     xml_add_versioning(metadata, model.versioning)
     xml_add_plugins(metadata, model.plugins)
 

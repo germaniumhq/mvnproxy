@@ -2,14 +2,14 @@ from typing import Optional, List
 
 
 class ModelMetadata:
-    def __init__(self, *, groupId: str, artifactId: str) -> None:
+    def __init__(self, *, groupId: Optional[str], artifactId: Optional[str]) -> None:
         self.model_version = "1.1.0"
-        self.groupId = groupId
-        self.artifactId = artifactId
+        self.groupId: Optional[str] = groupId
+        self.artifactId: Optional[str] = artifactId
         self.version: Optional[
             str
         ] = None  # the version this folder represents, used for snapshots only
-        self.versioning: Versioning = Versioning()
+        self.versioning: Optional[Versioning] = None
         self.plugins: List[Plugin] = []
 
     def merge(self, source_metadata: "ModelMetadata") -> None:

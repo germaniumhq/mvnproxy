@@ -1,44 +1,54 @@
 from typing import Optional
 from xml.etree.ElementTree import Element
 
-from mvnproxy.metadata.model import ModelMetadata, Snapshot, SnapshotVersion, Plugin
+from mvnproxy.metadata.model import ModelMetadata, Snapshot, SnapshotVersion, Plugin, Versioning
+from mvnproxy.metadata import merger
+import logging
+
+LOG = logging.getLogger(__name__)
 
 
 def read_model(metadata: Element) -> ModelMetadata:
-    # read base
-    result = ModelMetadata(
-        groupId=xml_read_required_text(metadata, "./groupId"),
-        artifactId=xml_read_required_text(metadata, "./artifactId"),
-    )
-    result.version = xml_read_text(metadata, "./version")
-
-    # read versioning
-    result.versioning.lastUpdated = xml_read_text(metadata, "./versioning/lastUpdated")
-    result.versioning.latest = xml_read_text(metadata, "./versioning/latest")
-    result.versioning.release = xml_read_text(metadata, "./versioning/release")
-    result.versioning.snapshot = xml_read_snapshot(metadata, "./versioning/snapshot")
-
-    # read versioning/versions
-    for version_node in metadata.findall("./versioning/versions/version"):
-        if not version_node.text:
-            raise Exception(f"Unable to find text in versoin node: {version_node}")
-
-        result.versioning.versions.append(version_node.text)
-
-    # read versioning/snapshotVersions
-    for snapshot_node in metadata.findall(
-        "./versioning/snapshotVersions/snapshotVersion"
-    ):
-        result.versioning.snapshotVersions.append(
-            xml_read_snapshot_version(snapshot_node)
+    try:
+        # read base
+        result = ModelMetadata(
+            groupId=xml_read_text(metadata, "./groupId"),
+            artifactId=xml_read_text(metadata, "./artifactId"),
         )
+        result.version = xml_read_text(metadata, "./version")
 
-    # read plugins
-    for plugin_node in metadata.findall("./plugins/plugin"):
-        result.plugins.append(xml_read_plugin(plugin_node))
+        # read versioning
+        if xml_exists(metadata, "./versioning"):
+            result.versioning = Versioning()
 
-    return result
+            result.versioning.lastUpdated = xml_read_text(metadata, "./versioning/lastUpdated")
+            result.versioning.latest = xml_read_text(metadata, "./versioning/latest")
+            result.versioning.release = xml_read_text(metadata, "./versioning/release")
+            result.versioning.snapshot = xml_read_snapshot(metadata, "./versioning/snapshot")
 
+            # read versioning/versions
+            for version_node in metadata.findall("./versioning/versions/version"):
+                if not version_node.text:
+                    raise Exception(f"Unable to find text in versoin node: {version_node}")
+
+                result.versioning.versions.append(version_node.text)
+
+            # read versioning/snapshotVersions
+            for snapshot_node in metadata.findall(
+                "./versioning/snapshotVersions/snapshotVersion"
+            ):
+                result.versioning.snapshotVersions.append(
+                    xml_read_snapshot_version(snapshot_node)
+                )
+
+        # read plugins
+        for plugin_node in metadata.findall("./plugins/plugin"):
+            result.plugins.append(xml_read_plugin(plugin_node))
+
+        return result
+
+    except Exception as e:
+        raise Exception("Unable to parse: " + merger.xml_to_string(metadata), e)
 
 def xml_read_snapshot(node: Element, path: str) -> Optional[Snapshot]:
     snapshot_node = node.find(path)
@@ -101,6 +111,12 @@ def xml_read_bool(node: Element, path: str) -> Optional[bool]:
         raise Exception(f"Unable to read bool on node {node} with path {path}")
 
     return n.text.lower() == "true"
+
+
+def xml_exists(node: Element, path: str) -> bool:
+    n = node.find(path)
+
+    return n is not None
 
 
 def xml_read_text(node: Element, path: str) -> Optional[str]:

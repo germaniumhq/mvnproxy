@@ -29,6 +29,14 @@ class TestXmlMerge(unittest.TestCase):
         pretty_xml_as_string = xml_to_string(xmlout)
         print(pretty_xml_as_string)
 
+    def plugins_missing_version(self) -> None:
+        xml1 = read_xml("tests/data/plugins-missing-version.xml")
+        xmlout = merge_maven_metadata([xml1])
+        self.assertTrue(xmlout, "we should have a merged xml")
+
+        pretty_xml_as_string = xml_to_string(xmlout)
+        print(pretty_xml_as_string)
+
     def test_merge_mixed_snapshot(self) -> None:
         xml1 = read_xml("tests/data/maven-snapshot-metadata.xml")
         xml2 = read_xml("tests/data/maven-metadata-full.xml")
